@@ -1,2 +1,5 @@
-ddfsdfdsfdsf
-sdfsd
+<%= @post.title %>
+<%= @post.post_content %>
+<% @post.comments.each do |comment| %>
+  <%= comment.content %>
+<% end %>

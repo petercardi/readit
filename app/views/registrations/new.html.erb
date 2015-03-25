@@ -1,0 +1,9 @@
+Sign Up
+
+<%= form_for @user, url: sign_up_path do |f| %>
+<%= f.label :email %>
+<%= f.email_field :email %>
+<%= f.label :password %>
+<%= f.password_field :password %>
+<%= f.submit "Sign Up" %>
+<% end %>

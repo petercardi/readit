@@ -28,13 +28,23 @@ feature 'Readit basic features' do
     expect(page).to have_content("Great comment from internetz")
     expect(page).to have_content("I <3 cats")
   end
+
+  scenario 'Only a logged in user can submit a new post' do
+    user = User.create!(email: "peter@cardi.com", password: "password")
+    sign_in(user)
+    visit root_path
+    click_link "New Post"
+
+    expect(page).to have_content("Add a New Post")
+    fill_in :title, with: "Title of my new post"
+    fill_in :post_content, with: "Content"
+    within("form") { click_button "Submit" }
+    expect(page).to have_content("Title of my new post")
+    expect(current_path).to eq(root_path)
+  end
 end
 
-
-
-
-# Anyone can click on a post to view its comments
-# Only a logged in user can submit a new post
+#
 # Only a logged in user can comment on a post
 # Only the owner/creator of a post can edit that post
 # Only the owner/creator of a post can delete that post
