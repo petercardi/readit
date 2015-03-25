@@ -4,17 +4,35 @@ require 'rails_helper'
 feature 'Readit basic features' do
   scenario 'Anyone can visit root page and see a list of all the posts' do
     user = User.create!(email: "peter@cardi.com", password: "password")
-    post1 = Post.create!(content: "Here is a great post", user_id: user.id)
-    post2 = Post.create!(content: "Another fantastic piece of content!")
-    visit root_path
+    post1 = Post.create!(title: "blah", post_content: "Here is a great post", user_id: user.id)
+    post2 = Post.create!(title: "berries", post_content: "Another fantastic piece of content!")
 
+    visit root_path
     expect(page).to have_content("Readit Main Page")
-    expect(page).to have_content("Here is a great post")
+    expect(page).to have_link("berries")
+    expect(page).to have_link("blah")
+  end
+
+  scenario 'Anyone can click on a post to view its comments' do
+    user = User.create!(email: "peter@cardi.com", password: "password")
+    post = Post.create!(title: "Shitty", post_content: "Another fantastic piece of content!")
+    Comment.create!(post_id: post.id, user_id: user.id, content: "Great comment from internetz")
+    Comment.create!(post_id: post.id, user_id: user.id, content: "I <3 cats")
+
+    visit root_path
+    click_link "Shitty"
+
+    expect(current_path).to eq(post_path(post))
+    expect(page).to have_content("Shitty")
     expect(page).to have_content("Another fantastic piece of content!")
+    expect(page).to have_content("Great comment from internetz")
+    expect(page).to have_content("I <3 cats")
   end
 end
 
-# Anyone can visit the root page and see a list of all the posts
+
+
+
 # Anyone can click on a post to view its comments
 # Only a logged in user can submit a new post
 # Only a logged in user can comment on a post
