@@ -32,7 +32,7 @@ feature 'Readit basic features' do
     expect(page).to have_content("I <3 cats")
   end
 
-  scenario 'Only a logged in user can submit a new post' do
+  scenario 'a logged in user can submit a new post' do
     user = User.create!(email: "peter@cardi.com", password: "password")
     sign_in(user)
     visit root_path
@@ -43,7 +43,7 @@ feature 'Readit basic features' do
     fill_in :post_post_content, with: "Content"
     within("form") { click_button "Create Post" }
     expect(page).to have_content("Title of my new post")
-    expect(current_path).to eq(user_posts_path(user))
+    expect(current_path).to eq(posts_path)
   end
 
   scenario 'Non-logged in user cannot submit a new post' do
@@ -55,7 +55,7 @@ feature 'Readit basic features' do
     user = User.create!(email: "peter@cardi.com", password: "password")
     post = Post.create!(title: "Shitty", post_content: "Another fantastic piece of content!")
     sign_in(user)
-    visit user_post_path(user, post)
+    visit post_path(post)
 
     fill_in :comment_content, with: "Blaaaahhh balallhdlfjg"
     click_button "My 2 Cents' Worth"
@@ -68,18 +68,46 @@ feature 'Readit basic features' do
     user = User.create!(email: "peter@cardi.com", password: "password")
     post = Post.create!(title: "Shitty", post_content: "Another fantastic piece of content!", user_id: user.id)
     sign_in(user)
-    visit user_post_path(user, post)
+    visit post_path(post)
     click_on "Edit Post"
     fill_in :post_post_content, with: "Just kidding, this is what I really wanted to say"
     click_button "Update Post"
     expect(page).to have_content("Just kidding, this is what I really wanted to say")
     expect(page).to have_content("Updated that schitt")
   end
+
+  scenario 'the owner/creator of a post can delete that post' do
+    user = User.create!(email: "peter@cardi.com", password: "password")
+    post = Post.create!(title: "Shitty", post_content: "Another fantastic piece of content!", user_id: user.id)
+    sign_in(user)
+    visit post_path(post)
+    click_on "Delete Post"
+
+    expect { post.reload }.to raise_error ActiveRecord::RecordNotFound
+    expect(current_path).to eq(posts_path)
+    expect(page).to have_content("BURN IT ALL")
+  end
+
+  scenario "non-owners cannot delete posts" do
+    user = User.create!(email: "peter@cardi.com", password: "password")
+    user2 = User.create!(email: "jo@schmo.com", password: "password")
+    post = Post.create!(title: "Shitty", post_content: "Another fantastic piece of content!", user_id: user.id)
+    sign_in(user2)
+
+    visit post_path(post)
+    expect(page).not_to have_content("Delete Post")
+  end
+
+  scenario 'Only the owner/creator of a comment can edit that comment' do
+    user = User.create!(email: "peter@cardi.com", password: "password")
+    post = Post.create!(title: "Shitty", post_content: "Another fantastic piece of content!", user_id: user.id)
+    comment = Comment.create(content: "Here's a thing", post_id: post.id, user_id: user.id)
+    sign_in(user)
+    visit post_path(post)
+
+    click_on "Edit Comment"
+    fill_in :comment_content, with: "This is actually the comment I wanted to make"
+    click_button "Update Comment"
+    expect(page).to have_content("This is actually the comment I wanted to make")
+  end
 end
-
-
-# Only the owner/creator of a post can delete that post
-# Only the owner/creator of a comment can edit that comment
-# Only the owner/creator of a comment can delete that comment
-# The specific models, routing, and views are completely up to you.
-#With that said, this assignment is meant to build on all the things you've been learning up to this point: authentication, nested routes, model associations, etc.
