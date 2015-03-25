@@ -36,15 +36,32 @@ feature 'Readit basic features' do
     click_link "New Post"
 
     expect(page).to have_content("Add a New Post")
-    fill_in :title, with: "Title of my new post"
-    fill_in :post_content, with: "Content"
-    within("form") { click_button "Submit" }
+    fill_in :post_title, with: "Title of my new post"
+    fill_in :post_post_content, with: "Content"
+    within("form") { click_button "CREATE DAT POST" }
     expect(page).to have_content("Title of my new post")
-    expect(current_path).to eq(root_path)
+    expect(current_path).to eq(posts_path)
+  end
+
+  scenario 'Non-logged in user cannot submit a new post' do
+    visit root_path
+    expect(page).to_not have_link("New Post")
+  end
+
+  scenario 'Only a logged in user can comment on a post' do
+    user = User.create!(email: "peter@cardi.com", password: "password")
+    post = Post.create!(title: "Shitty", post_content: "Another fantastic piece of content!")
+    sign_in(user)
+    visit post_path(post)
+
+    fill_in :comment_content, with: "Blaaaahhh balallhdlfjg"
+    click_link "My 2 Cents' Worth"
+    expect(current_path).to eq(post_path(post))
+    expect(page).to have_content("Thanks for regaling us with your shitty opinions")
+    expect(page).to have_content("Blaaaahhh balallhdlfjg")
   end
 end
 
-#
 # Only a logged in user can comment on a post
 # Only the owner/creator of a post can edit that post
 # Only the owner/creator of a post can delete that post

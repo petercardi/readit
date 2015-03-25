@@ -1,0 +1,9 @@
+Add a New Post
+
+<%= form_for @post do |f| %>
+  <%= f.label :title %>
+  <%= f.text_field :title %>
+  <%= f.label :post_content %>
+  <%= f.text_area :post_content %>
+  <%= f.submit "CREATE DAT POST" %>
+<% end %>

@@ -3,3 +3,11 @@
 <% @post.comments.each do |comment| %>
   <%= comment.content %>
 <% end %>
+
+<hr>
+
+<%= form_for [@post, @comment] do |c| %>
+  <%= c.label :content %>
+  <%= c.text_area :content %>
+  <%= c.submit "My 2 Cents' Worth" %>
+<% end %>
