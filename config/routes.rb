@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+
   root "posts#index"
 
   get "sign-up", to: "registrations#new"
@@ -7,13 +8,13 @@ Rails.application.routes.draw do
   post "sign-in", to: "authentication#create"
   get "sign-out", to: "authentication#destroy"
 
-  resources :users, only: [] do
+  resources :users do
     resources :posts
   end
 
   resources :posts, only: [:index, :show]
 
-  resources :posts, except: [:index, :show] do
+  resources :posts  do
     resources :comments, only: [:new, :create]
   end
 end
