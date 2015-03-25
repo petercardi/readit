@@ -1,4 +1,5 @@
 class PostsController < ApplicationController
+
   def index
     @posts = Post.all
   end
@@ -11,7 +12,7 @@ class PostsController < ApplicationController
     @post = Post.new(post_params)
     if @post.save
       flash[:notice] = "Post was created with GREAT SUCCESS"
-      redirect_to user_posts_path(user)
+      redirect_to user_posts_path(current_user)
     else
       render :new
     end

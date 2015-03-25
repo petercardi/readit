@@ -2,12 +2,15 @@
 require 'rails_helper'
 
 feature 'Readit basic features' do
+
   scenario 'Anyone can visit root page and see a list of all the posts' do
+
     user = User.create!(email: "peter@cardi.com", password: "password")
     post1 = Post.create!(title: "blah", post_content: "Here is a great post", user_id: user.id)
-    post2 = Post.create!(title: "berries", post_content: "Another fantastic piece of content!")
+    post2 = Post.create!(title: "berries", post_content: "Another fantastic piece of content!", user_id: user.id)
 
-    visit root_path
+    visit '/'
+
     expect(page).to have_content("Readit Main Page")
     expect(page).to have_link("berries")
     expect(page).to have_link("blah")
