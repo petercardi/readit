@@ -1,7 +1,7 @@
 Readit Main Page
 
 <% @posts.each do |post| %>
-  <%= link_to post.title, post_path(post)%>
+  <%= link_to post.title, user_post_path(post)%>
 <% end %>
 
 <% if current_user %>

@@ -15,7 +15,7 @@ feature 'Readit basic features' do
 
   scenario 'Anyone can click on a post to view its comments' do
     user = User.create!(email: "peter@cardi.com", password: "password")
-    post = Post.create!(title: "Shitty", post_content: "Another fantastic piece of content!")
+    post = Post.create!(title: "Shitty", post_content: "Another fantastic piece of content!", user_id: user.id)
     Comment.create!(post_id: post.id, user_id: user.id, content: "Great comment from internetz")
     Comment.create!(post_id: post.id, user_id: user.id, content: "I <3 cats")
 
@@ -38,9 +38,9 @@ feature 'Readit basic features' do
     expect(page).to have_content("Add a New Post")
     fill_in :post_title, with: "Title of my new post"
     fill_in :post_post_content, with: "Content"
-    within("form") { click_button "CREATE DAT POST" }
+    within("form") { click_button "Create Post" }
     expect(page).to have_content("Title of my new post")
-    expect(current_path).to eq(posts_path)
+    expect(current_path).to eq(user_posts_path(user))
   end
 
   scenario 'Non-logged in user cannot submit a new post' do
@@ -52,18 +52,29 @@ feature 'Readit basic features' do
     user = User.create!(email: "peter@cardi.com", password: "password")
     post = Post.create!(title: "Shitty", post_content: "Another fantastic piece of content!")
     sign_in(user)
-    visit post_path(post)
+    visit user_post_path(user, post)
 
     fill_in :comment_content, with: "Blaaaahhh balallhdlfjg"
-    click_link "My 2 Cents' Worth"
+    click_button "My 2 Cents' Worth"
     expect(current_path).to eq(post_path(post))
     expect(page).to have_content("Thanks for regaling us with your shitty opinions")
     expect(page).to have_content("Blaaaahhh balallhdlfjg")
   end
+
+  scenario 'Only the owner/creator of a post can edit that post' do
+    user = User.create!(email: "peter@cardi.com", password: "password")
+    post = Post.create!(title: "Shitty", post_content: "Another fantastic piece of content!", user_id: user.id)
+    sign_in(user)
+    visit user_post_path(user, post)
+    click_on "Edit Post"
+    fill_in :post_post_content, with: "Just kidding, this is what I really wanted to say"
+    click_button "Update Post"
+    expect(page).to have_content("Just kidding, this is what I really wanted to say")
+    expect(page).to have_content("Updated that schitt")
+  end
 end
 
-# Only a logged in user can comment on a post
-# Only the owner/creator of a post can edit that post
+
 # Only the owner/creator of a post can delete that post
 # Only the owner/creator of a comment can edit that comment
 # Only the owner/creator of a comment can delete that comment

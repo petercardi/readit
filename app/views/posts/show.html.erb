@@ -1,13 +1,18 @@
-<%= @post.title %>
-<%= @post.post_content %>
+<%= @post.title %><br>
+<%= @post.post_content %><br>
 <% @post.comments.each do |comment| %>
-  <%= comment.content %>
+  <%= comment.content %><br>
 <% end %>
 
 <hr>
+<%= flash[:notice] %>
 
 <%= form_for [@post, @comment] do |c| %>
   <%= c.label :content %>
   <%= c.text_area :content %>
   <%= c.submit "My 2 Cents' Worth" %>
+<% end %>
+
+<% if current_user && current_user.id == @post.user_id %>
+  <%= link_to "Edit Post", edit_post_path %>
 <% end %>

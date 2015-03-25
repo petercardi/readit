@@ -7,7 +7,13 @@ Rails.application.routes.draw do
   post "sign-in", to: "authentication#create"
   get "sign-out", to: "authentication#destroy"
 
-  resources :posts do
+  resources :users, only: [] do
+    resources :posts
+  end
+
+  resources :posts, only: [:index, :show]
+
+  resources :posts, except: [:index, :show] do
     resources :comments, only: [:new, :create]
   end
 end
